@@ -1,42 +1,46 @@
 "use client";
-import { useState } from 'react';
+import { useState } from "react";
 
 export default function Home() {
-  const [contrato, setContrato] = useState('');
-  const [resultado, setResultado] = useState('');
+  const [texto, setTexto] = useState("");
   const [cargando, setCargando] = useState(false);
 
-  const analizarConIA = async () => {
-    if (!contrato) return alert("Pega un contrato");
-    setCargando(true);
-    try {
-      const res = await fetch('/api/analyze', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: contrato }),
-      });
-      const data = await res.json();
-      setResultado(data.result || "Error en respuesta");
-    } catch (e) {
-      alert("Error en la web");
+  const irAPagar = () => {
+    if (!texto.trim()) {
+      alert("Por favor, pega un contrato primero.");
+      return;
     }
-    setCargando(false);
+    // Guardamos el contrato en la memoria del navegador para que no se pierda al pagar
+    localStorage.setItem("contrato_pendiente", texto);
+    // Redirigimos a tu Stripe
+    window.location.href = "https://buy.stripe.com/fZu28k2jv3nM01mdyG28800";
   };
 
   return (
     <main className="p-10 bg-white min-h-screen text-black">
-      <h1 className="text-2xl font-bold mb-4">Analizador de Contratos</h1>
-      <textarea 
-        className="w-full h-64 p-4 border mb-4" 
-        onChange={(e) => setContrato(e.target.value)} 
+      <h1 className="text-2xl font-bold mb-5">Analizador de Contratos IA</h1>
+      <textarea
+        className="w-full h-64 p-4 border border-gray-300 rounded mb-4"
+        placeholder="Pega aquí tu contrato..."
+        value={texto}
+        onChange={(e) => setTexto(e.target.value)}
       />
-      <button 
-        onClick={analizarConIA} 
-        className="bg-black text-white p-4 w-full font-bold"
-      >
-        {cargando ? "ANALIZANDO..." : "ANALIZAR"}
-      </button>
-      {resultado && <div className="mt-10 p-4 bg-gray-100">{resultado}</div>}
+      
+      <div className="bg-blue-50 p-6 border-l-4 border-blue-500 mb-6">
+        <p className="text-lg mb-4">
+          Nuestro sistema analizará las cláusulas de tu contrato para detectar riesgos legales.
+        </p>
+        <button
+          onClick={irAPagar}
+          className="bg-black text-white px-8 py-4 rounded font-bold text-xl hover:bg-gray-800 w-full"
+        >
+          ANALIZAR AHORA (9€)
+        </button>
+      </div>
+
+      <p className="text-sm text-gray-500 text-center">
+        Pago seguro procesado por Stripe. Obtén tu análisis profesional al instante.
+      </p>
     </main>
   );
 }
